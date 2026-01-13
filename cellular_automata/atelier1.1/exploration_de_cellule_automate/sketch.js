@@ -1,5 +1,5 @@
 // Taille de chaque cellule/rectangle du tableau
-let cellSize = 20;
+let cellSize = 10;
 // Nombre de colonnes
 let columnCount;
 // Nombre de lignes
@@ -15,20 +15,20 @@ function setup() {
 
   // Calcul le nombre colonnes et de lignes du canva en fonction de la taille de cellule choisis.
   // Calcul la hauteur et la largeur du canva en taille de cellule
+  // floor permet d'arrondir la valeur
   columnCount = floor(width / cellSize);
   rowCount = floor(height / cellSize);
 
-// Ce premier remplissage vide permet d'afficher un tableau noir avant d'initialiser le tableau avec le clique de manière aléatoire
-// Remplissage des colonnes du tableau par des valeurs vides
+  // Ce premier remplissage vide permet d'afficher un tableau noir avant d'initialiser le tableau avec le clique de manière aléatoire
+  // Remplissage des colonnes du tableau 1 par des valeurs vides
   for (let column = 0; column < columnCount; column++) {
     currentCells[column] = [];
   }
 
-// Remplissage des colonnes du tableau par des valeurs vides
+  // Remplissage des colonnes du tableau 2 par des valeurs vides
   for (let column = 0; column < columnCount; column++) {
     nextCells[column] = [];
   }
-
 }
 
 
@@ -44,11 +44,11 @@ function randomizeBoard() {
       for (let row = 0; row < rowCount; row++) {
       currentCells[column][row] = random([0, 1]);
     }
-}
+  }
 }
 
 function generate() {
-  // Loop through every spot in our 2D array and count living neighbors
+  // Boucle pour parcourir le tableau en ligne et colonne
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
       // Stocke la position de la colonne gauche de la position actuelle, si elle est à une bordure stocke la position de droite
