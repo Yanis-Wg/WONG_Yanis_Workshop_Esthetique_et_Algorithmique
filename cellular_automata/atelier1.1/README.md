@@ -1,4 +1,4 @@
-# Cellule Automate
+# Automate Cellulaire
 
 ## Projet
 
