@@ -1,5 +1,5 @@
 // Taille de chaque cellule/rectangle du tableau
-let cellSize = 20;
+let cellSize = 8;
 // Nombre de colonnes
 let columnCount;
 // Nombre de lignes
@@ -16,10 +16,12 @@ let alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p",
 let long_sentence_tab=[];
 let short_sentence_tab=[];
 let start=true;
+let wordLetters=0;
+let startCol=0;
 
 function setup() {
   // Influe sur le rythme de l'évolution de la cellule automate
-  frameRate(9);
+  frameRate(39);
   createCanvas(800, 750);
   background(0);
   // Parametrage affichage du texte
@@ -37,6 +39,9 @@ function setup() {
   for (let column = 0; column < columnCount; column++) {
     nextCells[column] = [];
   }
+  for (let column = 0; column < columnCount; column++) {
+    tab_with_letter[column] = [];
+  }
   randomizeBoard();
 }
 
@@ -47,59 +52,65 @@ function keyPressed(){
 }
 
 function draw() {
+  let wordIndex=0;
   // Pause ou Play
   if(!start){
     return;
   }
   // Background
   background(0);
-  // Affichage du tableau 
+
+  // nettoyage et initialisation du tableau de lettre
+  for(let row=0;row<rowCount;row++){
+    for(let column = 0;column<columnCount;column++){
+      tab_with_letter[column][row]='0';
+    }
+  }
   
-  let wordIndex=0;
   for (let row = 0; row < rowCount; row++) {
     for (let column = 0; column < columnCount; column++) {
       let cell = currentCells[column][row];
-      if(cell===0){
-        fill("green");
-        textAlign(CENTER, CENTER);
-        text(alphabet[floor(random(26))],column * cellSize + cellSize/2, row * cellSize + cellSize/2);
-        // Copie des valeurs dans un tableau uniquement remplis de lettre
-        tab_with_letter=[column][row]=alphabet[floor(random(26))];
-      }else if(cell===1&& wordIndex < number_of_word){
-        fill("white");
-        textAlign(CENTER, CENTER);
+      if(cell===1&& wordIndex < number_of_word){
         if(number_of_word===5){
           // Pour que chaque lettre soit séparé du mot.
-          let wordLetters = short_sentence_tab[wordIndex].split('');
-          let startCol = column; // colonne où se trouve le 1
-          
-        for (let l = 0; l < wordLetters.length; l++) {
-          // On remplace là où on est sensé avoir des 1 par 0
-          tab_with_letter=[l][row]=0;
-          if (startCol + l < columnCount) { // pour ne pas sortir de la grille
-            fill(0, 255, 0); // couleur lettre
-            text(wordLetters[l],
-                (startCol + l) * cellSize + cellSize/2,
-                row * cellSize + cellSize/2);
-          }else if(startCol + l >= columnCount){
-            startCol=random([0,columnCount-1]);
-            l--;
-          }
+          wordLetters = short_sentence_tab[wordIndex].split('');
+        }else{
+          wordLetters = long_sentence_tab[wordIndex].split('');
         }
-        }else if(number_of_word===6){
-          let wordLetters = long_sentence_tab[wordIndex].split('');
-          text(long_sentence_tab[wordIndex], column * cellSize + cellSize/2, row * cellSize + cellSize/2);
+
+        startCol = column; // colonne où se trouve le 1
+
+        for (let l = 0; l < wordLetters.length; l++) {
+          // On remplace par les lettres de chaque mot là ou on a des 1 
+          tab_with_letter[startCol+l][row]=wordLetters[l];
         }
         wordIndex++;
+      }
+    }
+  }
+  for (let row = 0; row < rowCount; row++) {
+    for (let column = 0; column < columnCount; column++) {
+      let case_value = tab_with_letter[column][row];
+      textAlign(CENTER, CENTER);
+      // Si la valeur dans le tableau n'est pas le caractere 0 alors affiche la lettre de couleur verte
+      if(case_value==='0'){
+        fill("green");
+        text(alphabet[floor(random(26))],column * cellSize + cellSize/2, row * cellSize + cellSize/2);
+        // Si la valeur dans le tableay est le caratere 0 alors compte le nombre de 0, si 5 prend "short_sentence_tab" sinon prend "long_sentence_tab"
+      }else{
+        textStyle(BOLD)
+        fill("white");
+        text(case_value,column * cellSize + cellSize/2, row * cellSize + cellSize/2);
+        textStyle(NORMAL);
       }
     }
   }
 }
 
 let premier = ['Salut','Bonjour','Salutation','Hey','Yo','Eh'];
-let deuxieme = ['patron', 'Alina', 'papi', 'tonton','mademoiselle','Raphael','Agathe','Julien','Marine'];
-let adjectifs = ['mochement','magnifikement','vraiment','salement','honnetement'];
-let noms = ['petit(e)','chauve','magnifike','crazy','intelligente','glacant(e)'];
+let deuxieme = ['patron', 'Alina', 'papi', 'tonton','Patrick','Raphael','Agathe','Julien','Marine'];
+let adjectifs = ['mochement','magnifiquement','vraiment','salement','honnetement'];
+let noms = ['petit(e)','chauve','magnifique','crazy','intelligente','glacant(e)'];
 
 function maybe(words){
     if (random([false, true])){
@@ -125,8 +136,6 @@ function letter() {
   return txt;
 }
 
-// AUTOMATE CELLULAIRE -----------------------------------------------------
-
 // Lorsqu'on appui sur le canva le tableau fait appel à la fonction qui réinitialise de maniere aléatoire les valeurs du tableau entre 0 et 1
 function mousePressed() {
     randomizeBoard();
@@ -143,16 +152,18 @@ function randomizeBoard() {
       currentCells[column][row] = 0;
     }
   }
+  // choisir si phrase longue ou courte
   let long_or_short=random([0,1]);
   if(long_or_short===0){
     number_of_word=5;
   }else if(long_or_short===1){
     number_of_word=6;
   }
+  // le nombre de 1 place
   let onesPlaced = 0;
   while (onesPlaced < number_of_word) {
-    let col = floor(random(columnCount));
-    let row = floor(random(rowCount));
+    let col = floor(random(15,columnCount-15));
+    let row = floor(random(15,rowCount-15));
     if (currentCells[col][row] === 0) {
       currentCells[col][row] = 1;
       onesPlaced++;
