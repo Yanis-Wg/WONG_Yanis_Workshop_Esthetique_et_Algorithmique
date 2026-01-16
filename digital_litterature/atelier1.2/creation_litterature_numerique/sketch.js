@@ -21,7 +21,7 @@ let startCol=0;
 
 function setup() {
   // Influe sur le rythme de l'évolution de la cellule automate
-  frameRate(39);
+  frameRate(109);
   createCanvas(800, 750);
   background(0);
   // Parametrage affichage du texte
